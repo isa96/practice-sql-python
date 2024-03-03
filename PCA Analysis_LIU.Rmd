@@ -1,0 +1,96 @@
+---
+title: "PCA Analysis"
+author: "Yizhou Liu"
+date: "09/12/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Preparation
+
+## Import Data
+```{r import data}
+dt <-  read.csv("/Users/yizhouliu/Documents/HU/ANLY 699/Social_Anxiety_Survey_Master.csv")
+```
+
+## Remove NAs (or impute). 10pts
+```{r check missing values}
+missingcells = sum(is.na(dt))
+print(missingcells)
+
+# No missing data in this dataset.
+```
+
+```{r data pre-processing}
+# remove the first column "Timestamp" as we don't need it in this study
+dt <- subset(dt, select = -Timestamp)
+```
+```{r convert data types}
+# convert data type of "Gender"
+sexType <- c(Male = 1, Female = 2, Other = 3)
+dt$Gender <- sexType[dt$Gender]
+
+# convert data type of "Student"
+isStudent <- c(Yes = 1, No = 0, Other = 3)
+dt$Student <- isStudent[dt$Student]
+
+# convert data type of "Age"
+ageGroup <- c("20 or below" = 1, "21 - 30" = 2, "31 - 40" = 3 )
+dt$Age <- ageGroup[dt$Age]
+
+# convert data type of "Marital"
+maritalStatus <- c(Single = 1, Married = 2)
+dt$Marital <- maritalStatus[dt$Marital]
+
+# convert data type of "Q1"
+smUseTime <- c("Less than 1 hours per day" = 1, "Less than 2 hours per day" = 2, "Less than 3 hours per day" = 3, "Less than 4 hours per day" = 4, "4 hours and above per day" = 5)
+dt$Q1 <- smUseTime[dt$Q1]
+
+
+```
+```{r}
+lapply(dt, as.numeric)
+```
+
+```{r standardization}
+scale(dt)
+```
+
+## Create a subset without dependent variable (outcome/response). 10pts
+```{r Create a subset without dependent variable (outcome/response)}
+# exclude columns Q6 and Q7
+subdt <- dt[c(-10, -11)]
+subdt
+```
+
+## Establish the optimal number of components: visualize the scree plot and explain your decision. 10pt
+```{r}
+subdt.pca <- prcomp(subdt, center = TRUE, scale = TRUE)
+summary(subdt.pca)
+
+```
+- We obtained 9 principal components, which we call PC1-9. Each of these explains a percentage of the total variation in the dataset. That is to say: PC1 explains 28% of the total variance, and PC2 explains 18% of the dataset. 
+
+```{r call str()}
+str(subdt.pca)
+```
+
+## Plotting PCA 
+
+
+```{r install devtools}
+library(devtools)
+```
+
+```{r install ggbiplot}
+library(ggbiplot)
+ggbiplot(subdt.pca)
+```
+
+
+- From the graph, we can see which vairables are similar to one another. For example, the Age and Martial status are culster together to the left, which makes sense, as these 2 factors are related.
+
+- In my thesis, I can use the dimensionality reduction to decide to use which variables to build my model that can best explain the result.

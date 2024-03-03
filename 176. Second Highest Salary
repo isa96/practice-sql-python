@@ -1,0 +1,2 @@
+SELECT MAX(Salary) AS SecondHighestSalary FROM employee,
+(SELECT MAX(salary) AS MaxSalary FROM employee) T WHERE MaxSalary != Salary

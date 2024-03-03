@@ -1,0 +1,11 @@
+with temp as
+(
+    select departmentID, name, salary, dense_rank()over(partition by departmentId order by salary desc) as 'rank'
+    from Employee
+) 
+
+select d.name as Department, t.name as Employee, t.salary as Salary
+from temp t
+join Department d
+on t.departmentId = d.id
+where t.rank = 1"
